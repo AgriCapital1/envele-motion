@@ -505,6 +505,26 @@ export type Database = {
         }
         Returns: boolean
       }
+      refund_credits: {
+        Args: {
+          _amount: number
+          _description: string
+          _ref_id: string
+          _ref_type: string
+          _user_id: string
+        }
+        Returns: number
+      }
+      spend_credits: {
+        Args: {
+          _amount: number
+          _description: string
+          _ref_id: string
+          _ref_type: string
+          _user_id: string
+        }
+        Returns: number
+      }
     }
     Enums: {
       app_role:
