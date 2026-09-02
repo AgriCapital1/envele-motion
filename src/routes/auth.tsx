@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 type Mode = "signin" | "signup" | "reset";
 
 export const Route = createFileRoute("/auth")({
-  validateSearch: (search: Record<string, unknown>): { mode?: "signin" | "signup" } => ({
+  validateSearch: (search: Record<string, unknown>): { mode?: "signin" | "signup" | undefined } => ({
     mode: search["mode"] === "signup" ? "signup" : search["mode"] === "signin" ? "signin" : undefined,
   }),
   head: () => ({
