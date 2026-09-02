@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthedCreateRouteImport } from './routes/_authed/create'
 import { Route as AuthedDashboardRouteImport } from './routes/_authed/dashboard'
 import { Route as AuthedProjectsRouteImport } from './routes/_authed/projects'
+import { Route as AuthedVideosRouteImport } from './routes/_authed/videos'
 import { Route as AuthedProductionProjectIdRouteImport } from './routes/_authed/production.$projectId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -46,6 +47,11 @@ const AuthedProjectsRoute = AuthedProjectsRouteImport.update({
   path: '/projects',
   getParentRoute: () => AuthedRoute,
 } as any)
+const AuthedVideosRoute = AuthedVideosRouteImport.update({
+  id: '/videos',
+  path: '/videos',
+  getParentRoute: () => AuthedRoute,
+} as any)
 const AuthedProductionProjectIdRoute =
   AuthedProductionProjectIdRouteImport.update({
     id: '/production/$projectId',
@@ -59,6 +65,7 @@ export interface FileRoutesByFullPath {
   '/create': typeof AuthedCreateRoute
   '/dashboard': typeof AuthedDashboardRoute
   '/projects': typeof AuthedProjectsRoute
+  '/videos': typeof AuthedVideosRoute
   '/production/$projectId': typeof AuthedProductionProjectIdRoute
 }
 export interface FileRoutesByTo {
@@ -67,6 +74,7 @@ export interface FileRoutesByTo {
   '/create': typeof AuthedCreateRoute
   '/dashboard': typeof AuthedDashboardRoute
   '/projects': typeof AuthedProjectsRoute
+  '/videos': typeof AuthedVideosRoute
   '/production/$projectId': typeof AuthedProductionProjectIdRoute
 }
 export interface FileRoutesById {
@@ -77,6 +85,7 @@ export interface FileRoutesById {
   '/_authed/create': typeof AuthedCreateRoute
   '/_authed/dashboard': typeof AuthedDashboardRoute
   '/_authed/projects': typeof AuthedProjectsRoute
+  '/_authed/videos': typeof AuthedVideosRoute
   '/_authed/production/$projectId': typeof AuthedProductionProjectIdRoute
 }
 export interface FileRouteTypes {
@@ -87,6 +96,7 @@ export interface FileRouteTypes {
     | '/create'
     | '/dashboard'
     | '/projects'
+    | '/videos'
     | '/production/$projectId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -95,6 +105,7 @@ export interface FileRouteTypes {
     | '/create'
     | '/dashboard'
     | '/projects'
+    | '/videos'
     | '/production/$projectId'
   id:
     | '__root__'
@@ -104,6 +115,7 @@ export interface FileRouteTypes {
     | '/_authed/create'
     | '/_authed/dashboard'
     | '/_authed/projects'
+    | '/_authed/videos'
     | '/_authed/production/$projectId'
   fileRoutesById: FileRoutesById
 }
@@ -157,6 +169,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedProjectsRouteImport
       parentRoute: typeof AuthedRoute
     }
+    '/_authed/videos': {
+      id: '/_authed/videos'
+      path: '/videos'
+      fullPath: '/videos'
+      preLoaderRoute: typeof AuthedVideosRouteImport
+      parentRoute: typeof AuthedRoute
+    }
     '/_authed/production/$projectId': {
       id: '/_authed/production/$projectId'
       path: '/production/$projectId'
@@ -171,6 +190,7 @@ interface AuthedRouteChildren {
   AuthedCreateRoute: typeof AuthedCreateRoute
   AuthedDashboardRoute: typeof AuthedDashboardRoute
   AuthedProjectsRoute: typeof AuthedProjectsRoute
+  AuthedVideosRoute: typeof AuthedVideosRoute
   AuthedProductionProjectIdRoute: typeof AuthedProductionProjectIdRoute
 }
 
@@ -178,6 +198,7 @@ const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedCreateRoute: AuthedCreateRoute,
   AuthedDashboardRoute: AuthedDashboardRoute,
   AuthedProjectsRoute: AuthedProjectsRoute,
+  AuthedVideosRoute: AuthedVideosRoute,
   AuthedProductionProjectIdRoute: AuthedProductionProjectIdRoute,
 }
 
