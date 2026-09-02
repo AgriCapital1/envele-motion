@@ -26,6 +26,8 @@ export const createProduction = createServerFn({ method: "POST" })
     style: string;
     language: string;
     title?: string;
+    voiceId?: string;
+    referenceImages?: string[];
   }) => {
     if (!input.brief || input.brief.trim().length < 10)
       throw new Error("Décrivez votre vidéo en au moins 10 caractères.");
@@ -41,6 +43,8 @@ export const createProduction = createServerFn({ method: "POST" })
         style: data.style,
         language: data.language,
         modelKey: "gemini-omni",
+        ...(data.voiceId ? { voiceId: data.voiceId } : {}),
+        ...(data.referenceImages?.length ? { referenceImages: data.referenceImages } : {}),
         ...(data.title ? { title: data.title } : {}),
       });
     } catch (error) {

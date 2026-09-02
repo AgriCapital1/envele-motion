@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { ReferenceUploader, type ReferenceImage } from "@/components/ReferenceUploader";
 
 export const Route = createFileRoute("/_authed/characters")({
   head: () => ({
@@ -38,6 +39,7 @@ function CharactersPage() {
   const [apparentAge, setApparentAge] = useState("");
   const [gender, setGender] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [avatar, setAvatar] = useState<ReferenceImage[]>([]);
 
   function reset() {
     setEditingId(null);
@@ -45,6 +47,7 @@ function CharactersPage() {
     setDescription("");
     setApparentAge("");
     setGender("");
+    setAvatar([]);
   }
 
   const saveMutation = useMutation({
@@ -56,6 +59,7 @@ function CharactersPage() {
           description,
           apparentAge,
           gender,
+          avatarUrl: avatar[0]?.url ?? null,
         },
       }),
     onSuccess: () => {
@@ -105,6 +109,14 @@ function CharactersPage() {
               <Input id="gender" value={gender} onChange={(e) => setGender(e.target.value)} />
             </div>
           </div>
+          <ReferenceUploader
+            label="Photo du personnage"
+            hint="Une photo de référence pour garder le même visage dans toutes vos vidéos."
+            max={1}
+            value={avatar}
+            onChange={setAvatar}
+          />
+
           <div className="flex gap-2">
             <Button
               disabled={saveMutation.isPending || !name.trim()}
@@ -129,6 +141,13 @@ function CharactersPage() {
             data?.map((c) => (
               <div key={c.id} className="rounded-xl border border-border bg-card p-4">
                 <div className="flex items-start justify-between gap-3">
+                  {c.avatarUrl ? (
+                    <img
+                      src={c.avatarUrl}
+                      alt={c.name}
+                      className="h-14 w-14 shrink-0 rounded-lg border border-border object-cover"
+                    />
+                  ) : null}
                   <div className="min-w-0">
                     <p className="font-medium">{c.name}</p>
                     <p className="text-xs text-muted-foreground">
@@ -146,6 +165,7 @@ function CharactersPage() {
                         setDescription(c.description ?? "");
                         setApparentAge(c.apparentAge ?? "");
                         setGender(c.gender ?? "");
+                        setAvatar(c.avatarUrl ? [{ path: c.avatarUrl, url: c.avatarUrl }] : []);
                       }}
                     >
                       Modifier

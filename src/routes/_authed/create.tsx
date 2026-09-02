@@ -5,6 +5,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 
 import { createProduction, listPricing } from "@/lib/production.functions";
+import { AFRICAN_VOICES } from "@/lib/voices";
+import { ReferenceUploader, type ReferenceImage } from "@/components/ReferenceUploader";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -42,6 +44,8 @@ function CreatePage() {
   const [aspectRatio, setRatio] = useState("16:9");
   const [style, setStyle] = useState(STYLES[0]!);
   const [language, setLanguage] = useState(LANGUAGES[0]!);
+  const [voiceId, setVoiceId] = useState(AFRICAN_VOICES[0]!.id);
+  const [references, setReferences] = useState<ReferenceImage[]>([]);
 
   const mutation = useMutation({
     mutationFn: () =>
@@ -52,6 +56,8 @@ function CreatePage() {
           aspectRatio,
           style,
           language,
+          voiceId,
+          referenceImages: references.map((r) => r.url),
           ...(title.trim() ? { title: title.trim() } : {}),
         },
       }),
@@ -94,6 +100,33 @@ function CreatePage() {
           </div>
 
           <div className="space-y-2">
+            <Label htmlFor="voice">Voix africaine</Label>
+            <select
+              id="voice"
+              value={voiceId}
+              onChange={(e) => setVoiceId(e.target.value)}
+              className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+            >
+              {AFRICAN_VOICES.map((v) => (
+                <option key={v.id} value={v.id}>
+                  {v.label}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-muted-foreground">
+              {AFRICAN_VOICES.find((v) => v.id === voiceId)?.description}
+            </p>
+          </div>
+
+          <ReferenceUploader
+            label="Personnes de référence (jusqu'à 10 photos)"
+            hint="Ajoutez les visages qui doivent apparaître dans la vidéo. Aperçu en miniature."
+            max={10}
+            value={references}
+            onChange={setReferences}
+          />
+
+          <div className="space-y-2">
             <Label>Durée</Label>
             <div className="flex flex-wrap gap-2">
               {(pricing ?? []).map((p) => (
@@ -129,6 +162,8 @@ function CreatePage() {
           <Row label="Format" value={aspectRatio} />
           <Row label="Style" value={style} />
           <Row label="Langue" value={language} />
+          <Row label="Voix" value={AFRICAN_VOICES.find((v) => v.id === voiceId)?.label ?? "—"} />
+          <Row label="Références" value={`${references.length} photo(s)`} />
           <Row label="Coût" value={`${selected?.credits ?? "—"} crédits`} />
           <Row label="Prix indicatif" value={`${selected?.priceFcfa ?? "—"} FCFA`} />
           <p className="pt-2 text-xs text-muted-foreground">
