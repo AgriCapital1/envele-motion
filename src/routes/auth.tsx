@@ -55,7 +55,7 @@ function AuthPage() {
     try {
       if (mode === "reset") {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/auth`,
+          redirectTo: `${window.location.origin}/reset-password`,
         });
         if (error) throw error;
         toast.success("Lien de réinitialisation envoyé par e-mail.");
@@ -83,14 +83,6 @@ function AuthPage() {
     } finally {
       setLoading(false);
     }
-  }
-
-  async function google() {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: `${window.location.origin}/dashboard` },
-    });
-    if (error) toast.error(error.message);
   }
 
   return (
@@ -168,17 +160,6 @@ function AuthPage() {
                     : "Se connecter"}
             </Button>
           </form>
-
-          {mode !== "reset" ? (
-            <>
-              <div className="my-4 text-center text-xs uppercase tracking-widest text-muted-foreground">
-                ou
-              </div>
-              <Button variant="outline" className="w-full" onClick={google} type="button">
-                Continuer avec Google
-              </Button>
-            </>
-          ) : null}
 
           <div className="mt-6 space-y-2 text-center text-sm text-muted-foreground">
             {mode === "signin" ? (
