@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthedAdminRouteImport } from './routes/_authed/admin'
 import { Route as AuthedCharactersRouteImport } from './routes/_authed/characters'
 import { Route as AuthedCreateRouteImport } from './routes/_authed/create'
 import { Route as AuthedCreditsRouteImport } from './routes/_authed/credits'
@@ -33,6 +34,11 @@ const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthedAdminRoute = AuthedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthedRoute,
 } as any)
 const AuthedCharactersRoute = AuthedCharactersRouteImport.update({
   id: '/characters',
@@ -74,6 +80,7 @@ const AuthedProductionProjectIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/admin': typeof AuthedAdminRoute
   '/characters': typeof AuthedCharactersRoute
   '/create': typeof AuthedCreateRoute
   '/credits': typeof AuthedCreditsRoute
@@ -85,6 +92,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/admin': typeof AuthedAdminRoute
   '/characters': typeof AuthedCharactersRoute
   '/create': typeof AuthedCreateRoute
   '/credits': typeof AuthedCreditsRoute
@@ -98,6 +106,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authed': typeof AuthedRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authed/admin': typeof AuthedAdminRoute
   '/_authed/characters': typeof AuthedCharactersRoute
   '/_authed/create': typeof AuthedCreateRoute
   '/_authed/credits': typeof AuthedCreditsRoute
@@ -111,6 +120,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/admin'
     | '/characters'
     | '/create'
     | '/credits'
@@ -122,6 +132,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/admin'
     | '/characters'
     | '/create'
     | '/credits'
@@ -134,6 +145,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authed'
     | '/auth'
+    | '/_authed/admin'
     | '/_authed/characters'
     | '/_authed/create'
     | '/_authed/credits'
@@ -171,6 +183,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authed/admin': {
+      id: '/_authed/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthedAdminRouteImport
+      parentRoute: typeof AuthedRoute
     }
     '/_authed/characters': {
       id: '/_authed/characters'
@@ -225,6 +244,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthedRouteChildren {
+  AuthedAdminRoute: typeof AuthedAdminRoute
   AuthedCharactersRoute: typeof AuthedCharactersRoute
   AuthedCreateRoute: typeof AuthedCreateRoute
   AuthedCreditsRoute: typeof AuthedCreditsRoute
@@ -235,6 +255,7 @@ interface AuthedRouteChildren {
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
+  AuthedAdminRoute: AuthedAdminRoute,
   AuthedCharactersRoute: AuthedCharactersRoute,
   AuthedCreateRoute: AuthedCreateRoute,
   AuthedCreditsRoute: AuthedCreditsRoute,

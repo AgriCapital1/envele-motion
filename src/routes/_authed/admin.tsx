@@ -35,7 +35,7 @@ function AdminPage() {
   });
 
   const mutation = useMutation({
-    mutationFn: (input: Parameters<typeof updateRule>[0] extends never ? never : {
+    mutationFn: (input: {
       id: string;
       priceFcfa: number;
       credits: number;
