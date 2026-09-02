@@ -14,6 +14,7 @@ import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthedCharactersRouteImport } from './routes/_authed/characters'
 import { Route as AuthedCreateRouteImport } from './routes/_authed/create'
+import { Route as AuthedCreditsRouteImport } from './routes/_authed/credits'
 import { Route as AuthedDashboardRouteImport } from './routes/_authed/dashboard'
 import { Route as AuthedProjectsRouteImport } from './routes/_authed/projects'
 import { Route as AuthedVideosRouteImport } from './routes/_authed/videos'
@@ -43,6 +44,11 @@ const AuthedCreateRoute = AuthedCreateRouteImport.update({
   path: '/create',
   getParentRoute: () => AuthedRoute,
 } as any)
+const AuthedCreditsRoute = AuthedCreditsRouteImport.update({
+  id: '/credits',
+  path: '/credits',
+  getParentRoute: () => AuthedRoute,
+} as any)
 const AuthedDashboardRoute = AuthedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -70,6 +76,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/characters': typeof AuthedCharactersRoute
   '/create': typeof AuthedCreateRoute
+  '/credits': typeof AuthedCreditsRoute
   '/dashboard': typeof AuthedDashboardRoute
   '/projects': typeof AuthedProjectsRoute
   '/videos': typeof AuthedVideosRoute
@@ -80,6 +87,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/characters': typeof AuthedCharactersRoute
   '/create': typeof AuthedCreateRoute
+  '/credits': typeof AuthedCreditsRoute
   '/dashboard': typeof AuthedDashboardRoute
   '/projects': typeof AuthedProjectsRoute
   '/videos': typeof AuthedVideosRoute
@@ -92,6 +100,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authed/characters': typeof AuthedCharactersRoute
   '/_authed/create': typeof AuthedCreateRoute
+  '/_authed/credits': typeof AuthedCreditsRoute
   '/_authed/dashboard': typeof AuthedDashboardRoute
   '/_authed/projects': typeof AuthedProjectsRoute
   '/_authed/videos': typeof AuthedVideosRoute
@@ -104,6 +113,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/characters'
     | '/create'
+    | '/credits'
     | '/dashboard'
     | '/projects'
     | '/videos'
@@ -114,6 +124,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/characters'
     | '/create'
+    | '/credits'
     | '/dashboard'
     | '/projects'
     | '/videos'
@@ -125,6 +136,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authed/characters'
     | '/_authed/create'
+    | '/_authed/credits'
     | '/_authed/dashboard'
     | '/_authed/projects'
     | '/_authed/videos'
@@ -174,6 +186,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedCreateRouteImport
       parentRoute: typeof AuthedRoute
     }
+    '/_authed/credits': {
+      id: '/_authed/credits'
+      path: '/credits'
+      fullPath: '/credits'
+      preLoaderRoute: typeof AuthedCreditsRouteImport
+      parentRoute: typeof AuthedRoute
+    }
     '/_authed/dashboard': {
       id: '/_authed/dashboard'
       path: '/dashboard'
@@ -208,6 +227,7 @@ declare module '@tanstack/react-router' {
 interface AuthedRouteChildren {
   AuthedCharactersRoute: typeof AuthedCharactersRoute
   AuthedCreateRoute: typeof AuthedCreateRoute
+  AuthedCreditsRoute: typeof AuthedCreditsRoute
   AuthedDashboardRoute: typeof AuthedDashboardRoute
   AuthedProjectsRoute: typeof AuthedProjectsRoute
   AuthedVideosRoute: typeof AuthedVideosRoute
@@ -217,6 +237,7 @@ interface AuthedRouteChildren {
 const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedCharactersRoute: AuthedCharactersRoute,
   AuthedCreateRoute: AuthedCreateRoute,
+  AuthedCreditsRoute: AuthedCreditsRoute,
   AuthedDashboardRoute: AuthedDashboardRoute,
   AuthedProjectsRoute: AuthedProjectsRoute,
   AuthedVideosRoute: AuthedVideosRoute,
