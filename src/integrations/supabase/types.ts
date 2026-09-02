@@ -51,6 +51,7 @@ export type Database = {
         Row: {
           apparent_age: string | null
           appearance: Json
+          avatar_url: string | null
           created_at: string
           description: string | null
           gender: string | null
@@ -66,6 +67,7 @@ export type Database = {
         Insert: {
           apparent_age?: string | null
           appearance?: Json
+          avatar_url?: string | null
           created_at?: string
           description?: string | null
           gender?: string | null
@@ -81,6 +83,7 @@ export type Database = {
         Update: {
           apparent_age?: string | null
           appearance?: Json
+          avatar_url?: string | null
           created_at?: string
           description?: string | null
           gender?: string | null
@@ -334,12 +337,14 @@ export type Database = {
           on_screen_text: string | null
           production_plan: Json
           quality_score: number | null
+          reference_images: Json
           status: Database["public"]["Enums"]["job_status"]
           style: string
           title: string
           updated_at: string
           user_id: string
           version: number
+          voice_id: string | null
         }
         Insert: {
           archived?: boolean
@@ -355,12 +360,14 @@ export type Database = {
           on_screen_text?: string | null
           production_plan?: Json
           quality_score?: number | null
+          reference_images?: Json
           status?: Database["public"]["Enums"]["job_status"]
           style?: string
           title?: string
           updated_at?: string
           user_id: string
           version?: number
+          voice_id?: string | null
         }
         Update: {
           archived?: boolean
@@ -376,12 +383,14 @@ export type Database = {
           on_screen_text?: string | null
           production_plan?: Json
           quality_score?: number | null
+          reference_images?: Json
           status?: Database["public"]["Enums"]["job_status"]
           style?: string
           title?: string
           updated_at?: string
           user_id?: string
           version?: number
+          voice_id?: string | null
         }
         Relationships: []
       }
