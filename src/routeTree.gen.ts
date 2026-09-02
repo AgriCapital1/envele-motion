@@ -10,33 +10,155 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthedRouteImport } from './routes/_authed'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthedAdminRouteImport } from './routes/_authed/admin'
+import { Route as AuthedCharactersRouteImport } from './routes/_authed/characters'
+import { Route as AuthedCreateRouteImport } from './routes/_authed/create'
+import { Route as AuthedCreditsRouteImport } from './routes/_authed/credits'
+import { Route as AuthedDashboardRouteImport } from './routes/_authed/dashboard'
+import { Route as AuthedProjectsRouteImport } from './routes/_authed/projects'
+import { Route as AuthedVideosRouteImport } from './routes/_authed/videos'
+import { Route as AuthedProductionProjectIdRouteImport } from './routes/_authed/production.$projectId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthedRoute = AuthedRouteImport.update({
+  id: '/_authed',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthedAdminRoute = AuthedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedCharactersRoute = AuthedCharactersRouteImport.update({
+  id: '/characters',
+  path: '/characters',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedCreateRoute = AuthedCreateRouteImport.update({
+  id: '/create',
+  path: '/create',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedCreditsRoute = AuthedCreditsRouteImport.update({
+  id: '/credits',
+  path: '/credits',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedDashboardRoute = AuthedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedProjectsRoute = AuthedProjectsRouteImport.update({
+  id: '/projects',
+  path: '/projects',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedVideosRoute = AuthedVideosRouteImport.update({
+  id: '/videos',
+  path: '/videos',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedProductionProjectIdRoute =
+  AuthedProductionProjectIdRouteImport.update({
+    id: '/production/$projectId',
+    path: '/production/$projectId',
+    getParentRoute: () => AuthedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/admin': typeof AuthedAdminRoute
+  '/characters': typeof AuthedCharactersRoute
+  '/create': typeof AuthedCreateRoute
+  '/credits': typeof AuthedCreditsRoute
+  '/dashboard': typeof AuthedDashboardRoute
+  '/projects': typeof AuthedProjectsRoute
+  '/videos': typeof AuthedVideosRoute
+  '/production/$projectId': typeof AuthedProductionProjectIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/admin': typeof AuthedAdminRoute
+  '/characters': typeof AuthedCharactersRoute
+  '/create': typeof AuthedCreateRoute
+  '/credits': typeof AuthedCreditsRoute
+  '/dashboard': typeof AuthedDashboardRoute
+  '/projects': typeof AuthedProjectsRoute
+  '/videos': typeof AuthedVideosRoute
+  '/production/$projectId': typeof AuthedProductionProjectIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authed': typeof AuthedRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authed/admin': typeof AuthedAdminRoute
+  '/_authed/characters': typeof AuthedCharactersRoute
+  '/_authed/create': typeof AuthedCreateRoute
+  '/_authed/credits': typeof AuthedCreditsRoute
+  '/_authed/dashboard': typeof AuthedDashboardRoute
+  '/_authed/projects': typeof AuthedProjectsRoute
+  '/_authed/videos': typeof AuthedVideosRoute
+  '/_authed/production/$projectId': typeof AuthedProductionProjectIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/admin'
+    | '/characters'
+    | '/create'
+    | '/credits'
+    | '/dashboard'
+    | '/projects'
+    | '/videos'
+    | '/production/$projectId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/admin'
+    | '/characters'
+    | '/create'
+    | '/credits'
+    | '/dashboard'
+    | '/projects'
+    | '/videos'
+    | '/production/$projectId'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authed'
+    | '/auth'
+    | '/_authed/admin'
+    | '/_authed/characters'
+    | '/_authed/create'
+    | '/_authed/credits'
+    | '/_authed/dashboard'
+    | '/_authed/projects'
+    | '/_authed/videos'
+    | '/_authed/production/$projectId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthedRoute: typeof AuthedRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +170,108 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authed': {
+      id: '/_authed'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authed/admin': {
+      id: '/_authed/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthedAdminRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/characters': {
+      id: '/_authed/characters'
+      path: '/characters'
+      fullPath: '/characters'
+      preLoaderRoute: typeof AuthedCharactersRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/create': {
+      id: '/_authed/create'
+      path: '/create'
+      fullPath: '/create'
+      preLoaderRoute: typeof AuthedCreateRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/credits': {
+      id: '/_authed/credits'
+      path: '/credits'
+      fullPath: '/credits'
+      preLoaderRoute: typeof AuthedCreditsRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/dashboard': {
+      id: '/_authed/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthedDashboardRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/projects': {
+      id: '/_authed/projects'
+      path: '/projects'
+      fullPath: '/projects'
+      preLoaderRoute: typeof AuthedProjectsRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/videos': {
+      id: '/_authed/videos'
+      path: '/videos'
+      fullPath: '/videos'
+      preLoaderRoute: typeof AuthedVideosRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/production/$projectId': {
+      id: '/_authed/production/$projectId'
+      path: '/production/$projectId'
+      fullPath: '/production/$projectId'
+      preLoaderRoute: typeof AuthedProductionProjectIdRouteImport
+      parentRoute: typeof AuthedRoute
+    }
   }
 }
 
+interface AuthedRouteChildren {
+  AuthedAdminRoute: typeof AuthedAdminRoute
+  AuthedCharactersRoute: typeof AuthedCharactersRoute
+  AuthedCreateRoute: typeof AuthedCreateRoute
+  AuthedCreditsRoute: typeof AuthedCreditsRoute
+  AuthedDashboardRoute: typeof AuthedDashboardRoute
+  AuthedProjectsRoute: typeof AuthedProjectsRoute
+  AuthedVideosRoute: typeof AuthedVideosRoute
+  AuthedProductionProjectIdRoute: typeof AuthedProductionProjectIdRoute
+}
+
+const AuthedRouteChildren: AuthedRouteChildren = {
+  AuthedAdminRoute: AuthedAdminRoute,
+  AuthedCharactersRoute: AuthedCharactersRoute,
+  AuthedCreateRoute: AuthedCreateRoute,
+  AuthedCreditsRoute: AuthedCreditsRoute,
+  AuthedDashboardRoute: AuthedDashboardRoute,
+  AuthedProjectsRoute: AuthedProjectsRoute,
+  AuthedVideosRoute: AuthedVideosRoute,
+  AuthedProductionProjectIdRoute: AuthedProductionProjectIdRoute,
+}
+
+const AuthedRouteWithChildren =
+  AuthedRoute._addFileChildren(AuthedRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthedRoute: AuthedRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

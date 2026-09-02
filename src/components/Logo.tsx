@@ -1,4 +1,6 @@
-import logo from "@/assets/logo-envle-motion.png";
+import logoAsset from "@/assets/logo-envle-motion.png.asset.json";
+
+const logo = logoAsset.url;
 
 export function Logo({ className = "h-10 w-10" }: { className?: string }) {
   return (
