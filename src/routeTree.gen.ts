@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthedCharactersRouteImport } from './routes/_authed/characters'
 import { Route as AuthedCreateRouteImport } from './routes/_authed/create'
 import { Route as AuthedDashboardRouteImport } from './routes/_authed/dashboard'
 import { Route as AuthedProjectsRouteImport } from './routes/_authed/projects'
@@ -31,6 +32,11 @@ const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthedCharactersRoute = AuthedCharactersRouteImport.update({
+  id: '/characters',
+  path: '/characters',
+  getParentRoute: () => AuthedRoute,
 } as any)
 const AuthedCreateRoute = AuthedCreateRouteImport.update({
   id: '/create',
@@ -62,6 +68,7 @@ const AuthedProductionProjectIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/characters': typeof AuthedCharactersRoute
   '/create': typeof AuthedCreateRoute
   '/dashboard': typeof AuthedDashboardRoute
   '/projects': typeof AuthedProjectsRoute
@@ -71,6 +78,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/characters': typeof AuthedCharactersRoute
   '/create': typeof AuthedCreateRoute
   '/dashboard': typeof AuthedDashboardRoute
   '/projects': typeof AuthedProjectsRoute
@@ -82,6 +90,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authed': typeof AuthedRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authed/characters': typeof AuthedCharactersRoute
   '/_authed/create': typeof AuthedCreateRoute
   '/_authed/dashboard': typeof AuthedDashboardRoute
   '/_authed/projects': typeof AuthedProjectsRoute
@@ -93,6 +102,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/characters'
     | '/create'
     | '/dashboard'
     | '/projects'
@@ -102,6 +112,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/characters'
     | '/create'
     | '/dashboard'
     | '/projects'
@@ -112,6 +123,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authed'
     | '/auth'
+    | '/_authed/characters'
     | '/_authed/create'
     | '/_authed/dashboard'
     | '/_authed/projects'
@@ -147,6 +159,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authed/characters': {
+      id: '/_authed/characters'
+      path: '/characters'
+      fullPath: '/characters'
+      preLoaderRoute: typeof AuthedCharactersRouteImport
+      parentRoute: typeof AuthedRoute
     }
     '/_authed/create': {
       id: '/_authed/create'
@@ -187,6 +206,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthedRouteChildren {
+  AuthedCharactersRoute: typeof AuthedCharactersRoute
   AuthedCreateRoute: typeof AuthedCreateRoute
   AuthedDashboardRoute: typeof AuthedDashboardRoute
   AuthedProjectsRoute: typeof AuthedProjectsRoute
@@ -195,6 +215,7 @@ interface AuthedRouteChildren {
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
+  AuthedCharactersRoute: AuthedCharactersRoute,
   AuthedCreateRoute: AuthedCreateRoute,
   AuthedDashboardRoute: AuthedDashboardRoute,
   AuthedProjectsRoute: AuthedProjectsRoute,
