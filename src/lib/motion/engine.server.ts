@@ -5,6 +5,8 @@
  */
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
+import { voicePromptHint } from "@/lib/voices";
+
 import { analyzeText, downloadVideo, generateVideo, getVideoJob } from "./gateway.server";
 
 export type ProductionInput = {
@@ -15,6 +17,8 @@ export type ProductionInput = {
   language: string;
   modelKey: string;
   title?: string;
+  voiceId?: string;
+  referenceImages?: string[];
 };
 
 export type PlanScene = {
@@ -95,6 +99,8 @@ CONTRAINTES DE PRODUCTION :
 - Format : ${input.aspectRatio}
 - Style : ${input.style}
 - Langue et accent des dialogues : ${input.language}
+- Voix demandée pour la narration et les dialogues : ${input.voiceId ? voicePromptHint(input.voiceId) : "voix africaine neutre"}
+- Personnes de référence fournies par l'utilisateur : ${(input.referenceImages ?? []).length} photo(s) — décris des personnages cohérents avec ces références tout au long des scènes.
 - Nombre exact de scènes à écrire : ${durations.length}
 - Durée imposée de chaque scène, dans l'ordre : ${durations.join(", ")} secondes
 - Le texte à afficher à l'écran doit être repris CARACTÈRE POUR CARACTÈRE depuis le brief s'il y en a un, sinon null.
@@ -152,6 +158,8 @@ export async function runCreateProduction(userId: string, input: ProductionInput
       style: input.style,
       language: input.language,
       model_key: input.modelKey,
+      voice_id: input.voiceId ?? null,
+      reference_images: (input.referenceImages ?? []) as never,
       status: "ANALYZING",
       credits_spent: rule.credits,
     })

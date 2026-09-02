@@ -6,7 +6,7 @@ export const listCharacters = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { data } = await context.supabase
       .from("characters")
-      .select("id, name, description, apparent_age, gender, created_at")
+      .select("id, name, description, apparent_age, gender, avatar_url, created_at")
       .order("created_at", { ascending: false });
     return (data ?? []).map((c) => ({
       id: c.id,
@@ -14,6 +14,7 @@ export const listCharacters = createServerFn({ method: "GET" })
       description: c.description,
       apparentAge: c.apparent_age,
       gender: c.gender,
+      avatarUrl: c.avatar_url,
       createdAt: c.created_at,
     }));
   });
@@ -26,6 +27,7 @@ export const saveCharacter = createServerFn({ method: "POST" })
     description: string;
     apparentAge: string;
     gender: string;
+    avatarUrl?: string | null;
   }) => {
     if (!input.name.trim()) throw new Error("Le nom du personnage est obligatoire.");
     return input;
@@ -36,6 +38,7 @@ export const saveCharacter = createServerFn({ method: "POST" })
       description: data.description,
       apparent_age: data.apparentAge,
       gender: data.gender,
+      avatar_url: data.avatarUrl ?? null,
     };
     if (data.id) {
       const { error } = await context.supabase
