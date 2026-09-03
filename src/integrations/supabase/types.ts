@@ -504,7 +504,30 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      pricing_public: {
+        Row: {
+          credits: number | null
+          duration_seconds: number | null
+          label: string | null
+          model_key: string | null
+          price_fcfa: number | null
+        }
+        Insert: {
+          credits?: number | null
+          duration_seconds?: number | null
+          label?: string | null
+          model_key?: string | null
+          price_fcfa?: number | null
+        }
+        Update: {
+          credits?: number | null
+          duration_seconds?: number | null
+          label?: string | null
+          model_key?: string | null
+          price_fcfa?: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       refund_credits: {
