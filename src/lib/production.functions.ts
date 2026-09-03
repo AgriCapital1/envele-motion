@@ -5,9 +5,8 @@ export const listPricing = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { data } = await context.supabase
-      .from("pricing_rules")
+      .from("pricing_public" as "pricing_rules")
       .select("duration_seconds, label, price_fcfa, credits")
-      .eq("active", true)
       .order("duration_seconds", { ascending: true });
     return (data ?? []).map((r) => ({
       durationSeconds: r.duration_seconds,
@@ -169,9 +168,8 @@ export const getCredits = createServerFn({ method: "GET" })
         .order("created_at", { ascending: false })
         .limit(50),
       context.supabase
-        .from("pricing_rules")
+        .from("pricing_public" as "pricing_rules")
         .select("duration_seconds, label, price_fcfa, credits")
-        .eq("active", true)
         .order("duration_seconds", { ascending: true }),
     ]);
 
