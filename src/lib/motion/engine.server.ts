@@ -30,6 +30,35 @@ export type PlanScene = {
 };
 
 const VIDEO_MODEL = "google/veo-3.1-lite";
+/** Les images de référence en asset strict exigent un modèle qui les accepte. */
+const VIDEO_MODEL_REF = "google/veo-3.1-fast";
+
+/** Consigne ferme envoyée au moteur vidéo lorsque des références sont fournies. */
+export const STRICT_ASSET_RULE = `STRICT ASSET RULE: the supplied reference images are exact assets, not inspiration.
+Reproduce every referenced person, face, logo, brand mark, product and garment pixel-faithfully and identically in every shot.
+Never redesign, restyle, re-letter, recolor, re-imagine or regenerate a logo, brand mark or character.
+No "inspired by" variation, no alternative version, no added or removed text on any logo.`;
+
+/** Télécharge les images de référence (chemins de stockage) et les encode pour le moteur vidéo. */
+async function loadReferenceImages(
+  paths: string[] | null,
+): Promise<Array<{ bytesBase64Encoded: string; mimeType: string }>> {
+  const list = (paths ?? []).filter((p) => typeof p === "string" && p && !p.startsWith("http"));
+  const out: Array<{ bytesBase64Encoded: string; mimeType: string }> = [];
+  for (const path of list.slice(0, 3)) {
+    const { data } = await supabaseAdmin.storage.from("references").download(path);
+    if (!data) continue;
+    const bytes = new Uint8Array(await data.arrayBuffer());
+    let binary = "";
+    for (let i = 0; i < bytes.length; i += 8192)
+      binary += String.fromCharCode(...bytes.subarray(i, i + 8192));
+    out.push({
+      bytesBase64Encoded: btoa(binary),
+      mimeType: path.endsWith(".png") ? "image/png" : "image/jpeg",
+    });
+  }
+  return out;
+}
 
 /** Découpage interne invisible pour l'utilisateur : une production = N séquences. */
 export function planDurations(total: number): Array<4 | 6 | 8> {
