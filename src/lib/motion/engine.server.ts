@@ -568,3 +568,40 @@ Ce qui a déjà été montré couvre les ${start} premières secondes. Écris la
 
   return getProductionState(userId, projectId);
 }
+
+/** Relancer une production échouée : les séquences ratées repartent en file, crédits redébités. */
+export async function runRegenerateProduction(userId: string, projectId: string) {
+  const project = await loadProject(userId, projectId);
+
+  const { data: rule } = await supabaseAdmin
+    .from("pricing_rules")
+    .select("credits")
+    .eq("model_key", "gemini-omni")
+    .eq("duration_seconds", project.duration_seconds)
+    .maybeSingle();
+
+  const cost = Number(rule?.credits ?? 0);
+  if (cost > 0) {
+    const { error } = await supabaseAdmin.rpc("spend_credits", {
+      _user_id: userId,
+      _amount: cost,
+      _ref_type: "project",
+      _ref_id: projectId,
+      _description: `Régénération ${project.duration_seconds}s`,
+    });
+    if (error) throw new Error("INSUFFICIENT_CREDITS");
+  }
+
+  await supabaseAdmin
+    .from("video_sequences")
+    .update({ status: "QUEUED", storage_path: null, job_id: null })
+    .eq("project_id", projectId)
+    .neq("status", "COMPLETED");
+
+  await supabaseAdmin
+    .from("projects")
+    .update({ status: "GENERATING", credits_spent: Number(project.credits_spent) + cost })
+    .eq("id", projectId);
+
+  return getProductionState(userId, projectId);
+}
