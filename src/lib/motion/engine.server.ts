@@ -182,7 +182,10 @@ export async function runCreateProduction(userId: string, input: ProductionInput
   }
 
   try {
-    const durations = planDurations(input.durationSeconds);
+    const hasRefs = (input.referenceImages ?? []).length > 0;
+    const durations: Array<4 | 6 | 8> = hasRefs
+      ? (Array.from({ length: Math.ceil(input.durationSeconds / 8) }, () => 8) as Array<8>)
+      : planDurations(input.durationSeconds);
     const plan = await buildProductionPlan(input, durations);
 
     await supabaseAdmin
