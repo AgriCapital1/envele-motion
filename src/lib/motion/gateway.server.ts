@@ -52,6 +52,8 @@ export async function analyzeText(system: string, user: string): Promise<string>
   return json.choices?.[0]?.message?.content ?? "";
 }
 
+export type InlineImage = { bytesBase64Encoded: string; mimeType: string };
+
 export type VideoRequest = {
   prompt: string;
   negativePrompt?: string;
@@ -59,19 +61,31 @@ export type VideoRequest = {
   aspectRatio: "16:9" | "9:16";
   model: string;
   seed?: number;
+  /** Images de référence utilisées en ASSET STRICT (jamais « inspiré de »). */
+  referenceImages?: InlineImage[];
 };
 
 /** Lance une génération vidéo (job asynchrone chez le fournisseur). */
 export async function generateVideo(req: VideoRequest): Promise<string> {
+  const refs = req.referenceImages ?? [];
   const parameters: Record<string, unknown> = {
-    durationSeconds: req.durationSeconds,
+    durationSeconds: refs.length ? 8 : req.durationSeconds,
     resolution: "720p",
     sampleCount: 1,
     generateAudio: true,
-    aspectRatio: req.aspectRatio,
   };
+  // Avec des références, le modèle déduit le cadrage : pas d'aspectRatio explicite.
+  if (!refs.length) parameters["aspectRatio"] = req.aspectRatio;
   if (req.negativePrompt) parameters["negativePrompt"] = req.negativePrompt;
   if (req.seed !== undefined) parameters["seed"] = req.seed;
+
+  const instance: Record<string, unknown> = { prompt: req.prompt };
+  if (refs.length) {
+    instance["referenceImages"] = refs.slice(0, 3).map((image) => ({
+      image,
+      referenceType: "asset",
+    }));
+  }
 
   const res = await fetch(`${GATEWAY}/videos`, {
     method: "POST",
@@ -81,7 +95,7 @@ export async function generateVideo(req: VideoRequest): Promise<string> {
     },
     body: JSON.stringify({
       model: req.model,
-      instances: [{ prompt: req.prompt }],
+      instances: [instance],
       parameters,
     }),
   });
@@ -99,6 +113,7 @@ export async function generateVideo(req: VideoRequest): Promise<string> {
   if (!job.id) throw fail(500, "Le moteur vidéo n'a pas renvoyé d'identifiant de production.");
   return job.id;
 }
+
 
 export type VideoJobState = {
   status: "in_progress" | "queued" | "completed" | "failed" | string;

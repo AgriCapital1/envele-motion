@@ -57,7 +57,7 @@ function CreatePage() {
           style,
           language,
           voiceId,
-          referenceImages: references.map((r) => r.url),
+          referenceImages: references.map((r) => r.path),
           ...(title.trim() ? { title: title.trim() } : {}),
         },
       }),

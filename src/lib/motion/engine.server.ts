@@ -30,6 +30,35 @@ export type PlanScene = {
 };
 
 const VIDEO_MODEL = "google/veo-3.1-lite";
+/** Les images de référence en asset strict exigent un modèle qui les accepte. */
+const VIDEO_MODEL_REF = "google/veo-3.1-fast";
+
+/** Consigne ferme envoyée au moteur vidéo lorsque des références sont fournies. */
+export const STRICT_ASSET_RULE = `STRICT ASSET RULE: the supplied reference images are exact assets, not inspiration.
+Reproduce every referenced person, face, logo, brand mark, product and garment pixel-faithfully and identically in every shot.
+Never redesign, restyle, re-letter, recolor, re-imagine or regenerate a logo, brand mark or character.
+No "inspired by" variation, no alternative version, no added or removed text on any logo.`;
+
+/** Télécharge les images de référence (chemins de stockage) et les encode pour le moteur vidéo. */
+async function loadReferenceImages(
+  paths: string[] | null,
+): Promise<Array<{ bytesBase64Encoded: string; mimeType: string }>> {
+  const list = (paths ?? []).filter((p) => typeof p === "string" && p && !p.startsWith("http"));
+  const out: Array<{ bytesBase64Encoded: string; mimeType: string }> = [];
+  for (const path of list.slice(0, 3)) {
+    const { data } = await supabaseAdmin.storage.from("references").download(path);
+    if (!data) continue;
+    const bytes = new Uint8Array(await data.arrayBuffer());
+    let binary = "";
+    for (let i = 0; i < bytes.length; i += 8192)
+      binary += String.fromCharCode(...bytes.subarray(i, i + 8192));
+    out.push({
+      bytesBase64Encoded: btoa(binary),
+      mimeType: path.endsWith(".png") ? "image/png" : "image/jpeg",
+    });
+  }
+  return out;
+}
 
 /** Découpage interne invisible pour l'utilisateur : une production = N séquences. */
 export function planDurations(total: number): Array<4 | 6 | 8> {
@@ -182,7 +211,10 @@ export async function runCreateProduction(userId: string, input: ProductionInput
   }
 
   try {
-    const durations = planDurations(input.durationSeconds);
+    const hasRefs = (input.referenceImages ?? []).length > 0;
+    const durations: Array<4 | 6 | 8> = hasRefs
+      ? (Array.from({ length: Math.ceil(input.durationSeconds / 8) }, () => 8) as Array<8>)
+      : planDurations(input.durationSeconds);
     const plan = await buildProductionPlan(input, durations);
 
     await supabaseAdmin
@@ -349,14 +381,18 @@ export async function runAdvanceProduction(userId: string, projectId: string) {
     .single();
 
   try {
+    const refs = await loadReferenceImages(project.reference_images as unknown as string[] | null);
     const providerJobId = await generateVideo({
-      prompt: next.prompt ?? "",
-      negativePrompt: "on-screen text, subtitles, watermark, distorted faces, extra limbs",
+      prompt: refs.length ? `${next.prompt ?? ""}\n\n${STRICT_ASSET_RULE}` : (next.prompt ?? ""),
+      negativePrompt:
+        "on-screen text, subtitles, watermark, distorted faces, extra limbs, redesigned logo, altered brand mark, different person",
       durationSeconds: next.duration_seconds as 4 | 6 | 8,
       aspectRatio: project.aspect_ratio === "9:16" ? "9:16" : "16:9",
-      model: VIDEO_MODEL,
+      model: refs.length ? VIDEO_MODEL_REF : VIDEO_MODEL,
       seed: 4242,
+      ...(refs.length ? { referenceImages: refs } : {}),
     });
+
 
     await supabaseAdmin
       .from("generation_jobs")
@@ -528,6 +564,43 @@ Ce qui a déjà été montré couvre les ${start} premières secondes. Écris la
       credits_spent: Number(project.credits_spent) + Number(rule.credits),
       version: project.version + 1,
     })
+    .eq("id", projectId);
+
+  return getProductionState(userId, projectId);
+}
+
+/** Relancer une production échouée : les séquences ratées repartent en file, crédits redébités. */
+export async function runRegenerateProduction(userId: string, projectId: string) {
+  const project = await loadProject(userId, projectId);
+
+  const { data: rule } = await supabaseAdmin
+    .from("pricing_rules")
+    .select("credits")
+    .eq("model_key", "gemini-omni")
+    .eq("duration_seconds", project.duration_seconds)
+    .maybeSingle();
+
+  const cost = Number(rule?.credits ?? 0);
+  if (cost > 0) {
+    const { error } = await supabaseAdmin.rpc("spend_credits", {
+      _user_id: userId,
+      _amount: cost,
+      _ref_type: "project",
+      _ref_id: projectId,
+      _description: `Régénération ${project.duration_seconds}s`,
+    });
+    if (error) throw new Error("INSUFFICIENT_CREDITS");
+  }
+
+  await supabaseAdmin
+    .from("video_sequences")
+    .update({ status: "QUEUED", storage_path: null, job_id: null })
+    .eq("project_id", projectId)
+    .neq("status", "COMPLETED");
+
+  await supabaseAdmin
+    .from("projects")
+    .update({ status: "GENERATING", credits_spent: Number(project.credits_spent) + cost })
     .eq("id", projectId);
 
   return getProductionState(userId, projectId);
