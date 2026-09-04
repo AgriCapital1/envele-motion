@@ -18,6 +18,7 @@ import { Route as AuthedCharactersRouteImport } from './routes/_authed/character
 import { Route as AuthedCreateRouteImport } from './routes/_authed/create'
 import { Route as AuthedCreditsRouteImport } from './routes/_authed/credits'
 import { Route as AuthedDashboardRouteImport } from './routes/_authed/dashboard'
+import { Route as AuthedLinguaRouteImport } from './routes/_authed/lingua'
 import { Route as AuthedProjectsRouteImport } from './routes/_authed/projects'
 import { Route as AuthedVideosRouteImport } from './routes/_authed/videos'
 import { Route as AuthedProductionProjectIdRouteImport } from './routes/_authed/production.$projectId'
@@ -66,6 +67,11 @@ const AuthedDashboardRoute = AuthedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthedRoute,
 } as any)
+const AuthedLinguaRoute = AuthedLinguaRouteImport.update({
+  id: '/lingua',
+  path: '/lingua',
+  getParentRoute: () => AuthedRoute,
+} as any)
 const AuthedProjectsRoute = AuthedProjectsRouteImport.update({
   id: '/projects',
   path: '/projects',
@@ -92,6 +98,7 @@ export interface FileRoutesByFullPath {
   '/create': typeof AuthedCreateRoute
   '/credits': typeof AuthedCreditsRoute
   '/dashboard': typeof AuthedDashboardRoute
+  '/lingua': typeof AuthedLinguaRoute
   '/projects': typeof AuthedProjectsRoute
   '/videos': typeof AuthedVideosRoute
   '/production/$projectId': typeof AuthedProductionProjectIdRoute
@@ -105,6 +112,7 @@ export interface FileRoutesByTo {
   '/create': typeof AuthedCreateRoute
   '/credits': typeof AuthedCreditsRoute
   '/dashboard': typeof AuthedDashboardRoute
+  '/lingua': typeof AuthedLinguaRoute
   '/projects': typeof AuthedProjectsRoute
   '/videos': typeof AuthedVideosRoute
   '/production/$projectId': typeof AuthedProductionProjectIdRoute
@@ -120,6 +128,7 @@ export interface FileRoutesById {
   '/_authed/create': typeof AuthedCreateRoute
   '/_authed/credits': typeof AuthedCreditsRoute
   '/_authed/dashboard': typeof AuthedDashboardRoute
+  '/_authed/lingua': typeof AuthedLinguaRoute
   '/_authed/projects': typeof AuthedProjectsRoute
   '/_authed/videos': typeof AuthedVideosRoute
   '/_authed/production/$projectId': typeof AuthedProductionProjectIdRoute
@@ -135,6 +144,7 @@ export interface FileRouteTypes {
     | '/create'
     | '/credits'
     | '/dashboard'
+    | '/lingua'
     | '/projects'
     | '/videos'
     | '/production/$projectId'
@@ -148,6 +158,7 @@ export interface FileRouteTypes {
     | '/create'
     | '/credits'
     | '/dashboard'
+    | '/lingua'
     | '/projects'
     | '/videos'
     | '/production/$projectId'
@@ -162,6 +173,7 @@ export interface FileRouteTypes {
     | '/_authed/create'
     | '/_authed/credits'
     | '/_authed/dashboard'
+    | '/_authed/lingua'
     | '/_authed/projects'
     | '/_authed/videos'
     | '/_authed/production/$projectId'
@@ -239,6 +251,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedDashboardRouteImport
       parentRoute: typeof AuthedRoute
     }
+    '/_authed/lingua': {
+      id: '/_authed/lingua'
+      path: '/lingua'
+      fullPath: '/lingua'
+      preLoaderRoute: typeof AuthedLinguaRouteImport
+      parentRoute: typeof AuthedRoute
+    }
     '/_authed/projects': {
       id: '/_authed/projects'
       path: '/projects'
@@ -269,6 +288,7 @@ interface AuthedRouteChildren {
   AuthedCreateRoute: typeof AuthedCreateRoute
   AuthedCreditsRoute: typeof AuthedCreditsRoute
   AuthedDashboardRoute: typeof AuthedDashboardRoute
+  AuthedLinguaRoute: typeof AuthedLinguaRoute
   AuthedProjectsRoute: typeof AuthedProjectsRoute
   AuthedVideosRoute: typeof AuthedVideosRoute
   AuthedProductionProjectIdRoute: typeof AuthedProductionProjectIdRoute
@@ -280,6 +300,7 @@ const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedCreateRoute: AuthedCreateRoute,
   AuthedCreditsRoute: AuthedCreditsRoute,
   AuthedDashboardRoute: AuthedDashboardRoute,
+  AuthedLinguaRoute: AuthedLinguaRoute,
   AuthedProjectsRoute: AuthedProjectsRoute,
   AuthedVideosRoute: AuthedVideosRoute,
   AuthedProductionProjectIdRoute: AuthedProductionProjectIdRoute,
