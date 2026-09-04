@@ -527,7 +527,7 @@ export type Database = {
       }
     }
     Functions: {
-      claim_daily_admin_credits: { Args: never; Returns: number }
+      claim_daily_admin_credits: { Args: { _user_id: string }; Returns: number }
       refund_credits: {
         Args: {
           _amount: number
