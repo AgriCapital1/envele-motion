@@ -349,14 +349,18 @@ export async function runAdvanceProduction(userId: string, projectId: string) {
     .single();
 
   try {
+    const refs = await loadReferenceImages(project.reference_images as unknown as string[] | null);
     const providerJobId = await generateVideo({
-      prompt: next.prompt ?? "",
-      negativePrompt: "on-screen text, subtitles, watermark, distorted faces, extra limbs",
+      prompt: refs.length ? `${next.prompt ?? ""}\n\n${STRICT_ASSET_RULE}` : (next.prompt ?? ""),
+      negativePrompt:
+        "on-screen text, subtitles, watermark, distorted faces, extra limbs, redesigned logo, altered brand mark, different person",
       durationSeconds: next.duration_seconds as 4 | 6 | 8,
       aspectRatio: project.aspect_ratio === "9:16" ? "9:16" : "16:9",
-      model: VIDEO_MODEL,
+      model: refs.length ? VIDEO_MODEL_REF : VIDEO_MODEL,
       seed: 4242,
+      ...(refs.length ? { referenceImages: refs } : {}),
     });
+
 
     await supabaseAdmin
       .from("generation_jobs")
