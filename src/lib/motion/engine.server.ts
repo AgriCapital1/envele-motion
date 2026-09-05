@@ -401,6 +401,7 @@ export async function runAdvanceProduction(userId: string, projectId: string) {
       durationSeconds: next.duration_seconds as 4 | 6 | 8,
       aspectRatio: project.aspect_ratio === "9:16" ? "9:16" : "16:9",
       model: refs.length ? VIDEO_MODEL_REF : VIDEO_MODEL,
+      resolution: next.duration_seconds === 8 ? "1080p" : "720p",
       seed: 4242,
       ...(refs.length ? { referenceImages: refs } : {}),
     });
