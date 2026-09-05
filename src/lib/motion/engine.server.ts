@@ -197,7 +197,7 @@ export async function runCreateProduction(userId: string, input: ProductionInput
       language: input.language,
       model_key: input.modelKey,
       voice_id: input.voiceId ?? null,
-      reference_images: (input.referenceImages ?? []) as never,
+      reference_images: sanitizeReferencePaths(input.referenceImages, userId) as never,
       status: "ANALYZING",
       credits_spent: rule.credits,
     })
