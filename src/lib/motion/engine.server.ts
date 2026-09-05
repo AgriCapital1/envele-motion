@@ -390,7 +390,10 @@ export async function runAdvanceProduction(userId: string, projectId: string) {
     .single();
 
   try {
-    const refs = await loadReferenceImages(project.reference_images as unknown as string[] | null);
+    const refs = await loadReferenceImages(
+      project.reference_images as unknown as string[] | null,
+      userId,
+    );
     const providerJobId = await generateVideo({
       prompt: refs.length ? `${next.prompt ?? ""}\n\n${STRICT_ASSET_RULE}` : (next.prompt ?? ""),
       negativePrompt:
