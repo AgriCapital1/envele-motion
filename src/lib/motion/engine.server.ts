@@ -469,6 +469,13 @@ export async function getProductionState(userId: string, projectId: string) {
   const done = list.filter((s) => s.status === "COMPLETED").length;
   const progress = list.length ? Math.round((done / list.length) * 100) : 0;
 
+  const finalPath = (project as { final_video_path?: string | null }).final_video_path ?? null;
+  let finalUrl: string | null = null;
+  if (finalPath) {
+    const { data } = await supabaseAdmin.storage.from("productions").createSignedUrl(finalPath, 3600);
+    finalUrl = data?.signedUrl ?? null;
+  }
+
   const { data: lastError } = await supabaseAdmin
     .from("generation_jobs")
     .select("error")
@@ -495,7 +502,6 @@ export async function getProductionState(userId: string, projectId: string) {
       plan: project.production_plan,
       createdAt: project.created_at,
       finalUrl,
-    },
     },
     sequences: list.map((s) => ({
       index: s.sequence_index,
