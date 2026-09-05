@@ -494,6 +494,8 @@ export async function getProductionState(userId: string, projectId: string) {
       bible: project.bible,
       plan: project.production_plan,
       createdAt: project.created_at,
+      finalUrl,
+    },
     },
     sequences: list.map((s) => ({
       index: s.sequence_index,
