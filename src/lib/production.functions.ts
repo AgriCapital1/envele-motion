@@ -193,3 +193,26 @@ export const getCredits = createServerFn({ method: "GET" })
       })),
     };
   });
+
+export const regenerateProduction = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { projectId: string }) => input)
+  .handler(async ({ data, context }) => {
+    const { runRegenerateProduction } = await import("@/lib/motion/engine.server");
+    try {
+      return await runRegenerateProduction(context.userId, data.projectId);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Erreur inconnue";
+      if (message === "INSUFFICIENT_CREDITS")
+        throw new Error("Crédits insuffisants pour relancer cette production.");
+      throw new Error(message);
+    }
+  });
+
+export const saveFinalVideo = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { projectId: string; path: string }) => input)
+  .handler(async ({ data, context }) => {
+    const { setFinalVideo } = await import("@/lib/motion/engine.server");
+    return setFinalVideo(context.userId, data.projectId, data.path);
+  });

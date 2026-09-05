@@ -331,6 +331,7 @@ export type Database = {
           created_at: string
           credits_spent: number
           duration_seconds: number
+          final_video_path: string | null
           id: string
           language: string
           model_key: string
@@ -354,6 +355,7 @@ export type Database = {
           created_at?: string
           credits_spent?: number
           duration_seconds?: number
+          final_video_path?: string | null
           id?: string
           language?: string
           model_key?: string
@@ -377,6 +379,7 @@ export type Database = {
           created_at?: string
           credits_spent?: number
           duration_seconds?: number
+          final_video_path?: string | null
           id?: string
           language?: string
           model_key?: string

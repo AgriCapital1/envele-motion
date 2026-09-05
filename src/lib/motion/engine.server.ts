@@ -29,9 +29,9 @@ export type PlanScene = {
   dialogue?: string;
 };
 
-const VIDEO_MODEL = "google/veo-3.1-lite";
+const VIDEO_MODEL = "veo-3.1-lite-generate-preview";
 /** Les images de référence en asset strict exigent un modèle qui les accepte. */
-const VIDEO_MODEL_REF = "google/veo-3.1-fast";
+const VIDEO_MODEL_REF = "veo-3.1-fast-generate-preview";
 
 /** Consigne ferme envoyée au moteur vidéo lorsque des références sont fournies. */
 export const STRICT_ASSET_RULE = `STRICT ASSET RULE: the supplied reference images are exact assets, not inspiration.
@@ -380,7 +380,7 @@ export async function runAdvanceProduction(userId: string, projectId: string) {
       project_id: projectId,
       kind: "sequence",
       status: "GENERATING",
-      provider: "lovable-ai-gateway",
+      provider: "google-gemini-veo",
       model: VIDEO_MODEL,
       params: { sequence_index: next.sequence_index, duration: next.duration_seconds } as never,
       started_at: new Date().toISOString(),
@@ -401,6 +401,7 @@ export async function runAdvanceProduction(userId: string, projectId: string) {
       durationSeconds: next.duration_seconds as 4 | 6 | 8,
       aspectRatio: project.aspect_ratio === "9:16" ? "9:16" : "16:9",
       model: refs.length ? VIDEO_MODEL_REF : VIDEO_MODEL,
+      resolution: next.duration_seconds === 8 ? "1080p" : "720p",
       seed: 4242,
       ...(refs.length ? { referenceImages: refs } : {}),
     });
@@ -468,6 +469,13 @@ export async function getProductionState(userId: string, projectId: string) {
   const done = list.filter((s) => s.status === "COMPLETED").length;
   const progress = list.length ? Math.round((done / list.length) * 100) : 0;
 
+  const finalPath = (project as { final_video_path?: string | null }).final_video_path ?? null;
+  let finalUrl: string | null = null;
+  if (finalPath) {
+    const { data } = await supabaseAdmin.storage.from("productions").createSignedUrl(finalPath, 3600);
+    finalUrl = data?.signedUrl ?? null;
+  }
+
   const { data: lastError } = await supabaseAdmin
     .from("generation_jobs")
     .select("error")
@@ -493,6 +501,7 @@ export async function getProductionState(userId: string, projectId: string) {
       bible: project.bible,
       plan: project.production_plan,
       createdAt: project.created_at,
+      finalUrl,
     },
     sequences: list.map((s) => ({
       index: s.sequence_index,
@@ -615,5 +624,16 @@ export async function runRegenerateProduction(userId: string, projectId: string)
     .update({ status: "GENERATING", credits_spent: Number(project.credits_spent) + cost })
     .eq("id", projectId);
 
+  return getProductionState(userId, projectId);
+}
+
+/** Enregistre la vidéo finale assemblée (chemin dans le dossier privé de l'utilisateur). */
+export async function setFinalVideo(userId: string, projectId: string, path: string) {
+  if (!path.startsWith(`${userId}/`)) throw new Error("Chemin de vidéo invalide.");
+  await supabaseAdmin
+    .from("projects")
+    .update({ final_video_path: path } as never)
+    .eq("id", projectId)
+    .eq("user_id", userId);
   return getProductionState(userId, projectId);
 }
