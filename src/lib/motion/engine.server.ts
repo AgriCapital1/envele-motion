@@ -39,11 +39,20 @@ Reproduce every referenced person, face, logo, brand mark, product and garment p
 Never redesign, restyle, re-letter, recolor, re-imagine or regenerate a logo, brand mark or character.
 No "inspired by" variation, no alternative version, no added or removed text on any logo.`;
 
+/** Ne conserve que les chemins appartenant à l'utilisateur (règle identique au RLS du bucket). */
+export function sanitizeReferencePaths(paths: string[] | null | undefined, userId: string): string[] {
+  return (paths ?? []).filter(
+    (p): p is string =>
+      typeof p === "string" && !p.startsWith("http") && p.startsWith(`${userId}/`),
+  );
+}
+
 /** Télécharge les images de référence (chemins de stockage) et les encode pour le moteur vidéo. */
 async function loadReferenceImages(
   paths: string[] | null,
+  userId: string,
 ): Promise<Array<{ bytesBase64Encoded: string; mimeType: string }>> {
-  const list = (paths ?? []).filter((p) => typeof p === "string" && p && !p.startsWith("http"));
+  const list = sanitizeReferencePaths(paths, userId);
   const out: Array<{ bytesBase64Encoded: string; mimeType: string }> = [];
   for (const path of list.slice(0, 3)) {
     const { data } = await supabaseAdmin.storage.from("references").download(path);
