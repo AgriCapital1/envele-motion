@@ -626,3 +626,14 @@ export async function runRegenerateProduction(userId: string, projectId: string)
 
   return getProductionState(userId, projectId);
 }
+
+/** Enregistre la vidéo finale assemblée (chemin dans le dossier privé de l'utilisateur). */
+export async function setFinalVideo(userId: string, projectId: string, path: string) {
+  if (!path.startsWith(`${userId}/`)) throw new Error("Chemin de vidéo invalide.");
+  await supabaseAdmin
+    .from("projects")
+    .update({ final_video_path: path } as never)
+    .eq("id", projectId)
+    .eq("user_id", userId);
+  return getProductionState(userId, projectId);
+}
