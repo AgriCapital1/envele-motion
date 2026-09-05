@@ -29,9 +29,9 @@ export type PlanScene = {
   dialogue?: string;
 };
 
-const VIDEO_MODEL = "google/veo-3.1-lite";
+const VIDEO_MODEL = "veo-3.1-lite-generate-preview";
 /** Les images de référence en asset strict exigent un modèle qui les accepte. */
-const VIDEO_MODEL_REF = "google/veo-3.1-fast";
+const VIDEO_MODEL_REF = "veo-3.1-fast-generate-preview";
 
 /** Consigne ferme envoyée au moteur vidéo lorsque des références sont fournies. */
 export const STRICT_ASSET_RULE = `STRICT ASSET RULE: the supplied reference images are exact assets, not inspiration.
