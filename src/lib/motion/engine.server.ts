@@ -220,7 +220,7 @@ export async function runCreateProduction(userId: string, input: ProductionInput
   }
 
   try {
-    const hasRefs = (input.referenceImages ?? []).length > 0;
+    const hasRefs = sanitizeReferencePaths(input.referenceImages, userId).length > 0;
     const durations: Array<4 | 6 | 8> = hasRefs
       ? (Array.from({ length: Math.ceil(input.durationSeconds / 8) }, () => 8) as Array<8>)
       : planDurations(input.durationSeconds);
