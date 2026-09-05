@@ -380,7 +380,7 @@ export async function runAdvanceProduction(userId: string, projectId: string) {
       project_id: projectId,
       kind: "sequence",
       status: "GENERATING",
-      provider: "lovable-ai-gateway",
+      provider: "google-gemini-veo",
       model: VIDEO_MODEL,
       params: { sequence_index: next.sequence_index, duration: next.duration_seconds } as never,
       started_at: new Date().toISOString(),
