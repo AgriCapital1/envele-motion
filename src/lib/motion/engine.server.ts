@@ -39,11 +39,20 @@ Reproduce every referenced person, face, logo, brand mark, product and garment p
 Never redesign, restyle, re-letter, recolor, re-imagine or regenerate a logo, brand mark or character.
 No "inspired by" variation, no alternative version, no added or removed text on any logo.`;
 
+/** Ne conserve que les chemins appartenant à l'utilisateur (règle identique au RLS du bucket). */
+export function sanitizeReferencePaths(paths: string[] | null | undefined, userId: string): string[] {
+  return (paths ?? []).filter(
+    (p): p is string =>
+      typeof p === "string" && !p.startsWith("http") && p.startsWith(`${userId}/`),
+  );
+}
+
 /** Télécharge les images de référence (chemins de stockage) et les encode pour le moteur vidéo. */
 async function loadReferenceImages(
   paths: string[] | null,
+  userId: string,
 ): Promise<Array<{ bytesBase64Encoded: string; mimeType: string }>> {
-  const list = (paths ?? []).filter((p) => typeof p === "string" && p && !p.startsWith("http"));
+  const list = sanitizeReferencePaths(paths, userId);
   const out: Array<{ bytesBase64Encoded: string; mimeType: string }> = [];
   for (const path of list.slice(0, 3)) {
     const { data } = await supabaseAdmin.storage.from("references").download(path);
@@ -188,7 +197,7 @@ export async function runCreateProduction(userId: string, input: ProductionInput
       language: input.language,
       model_key: input.modelKey,
       voice_id: input.voiceId ?? null,
-      reference_images: (input.referenceImages ?? []) as never,
+      reference_images: sanitizeReferencePaths(input.referenceImages, userId) as never,
       status: "ANALYZING",
       credits_spent: rule.credits,
     })
@@ -211,7 +220,7 @@ export async function runCreateProduction(userId: string, input: ProductionInput
   }
 
   try {
-    const hasRefs = (input.referenceImages ?? []).length > 0;
+    const hasRefs = sanitizeReferencePaths(input.referenceImages, userId).length > 0;
     const durations: Array<4 | 6 | 8> = hasRefs
       ? (Array.from({ length: Math.ceil(input.durationSeconds / 8) }, () => 8) as Array<8>)
       : planDurations(input.durationSeconds);
@@ -381,7 +390,10 @@ export async function runAdvanceProduction(userId: string, projectId: string) {
     .single();
 
   try {
-    const refs = await loadReferenceImages(project.reference_images as unknown as string[] | null);
+    const refs = await loadReferenceImages(
+      project.reference_images as unknown as string[] | null,
+      userId,
+    );
     const providerJobId = await generateVideo({
       prompt: refs.length ? `${next.prompt ?? ""}\n\n${STRICT_ASSET_RULE}` : (next.prompt ?? ""),
       negativePrompt:
